@@ -17,17 +17,17 @@
           <div class="st_list" style="width:100%;height: 18vh;">
             <ul class="li_ti">
             	<li>{{type_p==1?'学生姓名':'教师姓名'}}</li>
-            	<li>班级名称</li>
-            	<li>{{type_p==1?'创建时间':'上课开始时间'}}</li>
-            	<li>{{type_p==1?'最后一次考勤时间':'上课结束时间'}}</li>
+            	<li v-if="type_p==1">班级名称</li>
+            	<li>{{type_p==1?'创建时间':'考勤开始时间'}}</li>
+            	<li>{{type_p==1?'最后一次考勤时间':'考勤结束时间'}}</li>
               <li>考勤状态</li>
             </ul>
             <vue-seamless-scroll :data="list" class="seamless-warp"  :class-option="initOption" style="height: 100%;box-sizing: border-box;overflow: hidden;" >
                <ul class="i_list"  v-for="item in list">
                    <li>{{type_p==1?item.studentName:item.teacherName}}</li>
-                   <li>{{item.className}}</li>
-                   <li>{{type_p==1?changetime(item.createTime):item.courseStartTime}}</li>
-                   <li>{{type_p==1?changetime(item.lastAttTime):item.courseEndTime}}</li>
+                   <li  v-if="type_p==1">{{item.className}}</li>
+                   <li>{{type_p==1?changetime(item.createTime):changetime(item.attTime)}}</li>
+                   <li>{{type_p==1?changetime(item.lastAttTime):changetime(item.lastAttTime)}}</li>
                    <li :style="{color:item.attResult==1?'#FF9925':item.attResult==2?'#FF9EDE':item.attResult==3?'#FF7E7E':item.attResult==4?'#FF9925':'#1BF654'}">{{item.attResult==1?'旷课':item.attResult==2?'请假':item.attResult==3?'迟到':item.attResult==4?'早退':'正常'}}</li>
                </ul>
             </vue-seamless-scroll>
@@ -61,7 +61,7 @@
              </ul>
              <vue-seamless-scroll :data="list_beh" class="seamless-warp"  :class-option="initOption" style="height: 100%;box-sizing: border-box;overflow: hidden;" >
                 <ul class="i_list"  v-for="i in list_beh">
-                    <li>{{i.name}}</li>
+                    <li>{{i.humanName}}</li>
                     <li>{{i.className}}</li>
                     <li>
                       <span>{{i.posture=='sitting'?'坐下':i.posture=='standingUp'?'坐下':'未知'}}</span>
@@ -74,8 +74,8 @@
                       <span :style="{background:i.headOnDesk=='yes'?'#FF6347':''}">{{i.headOnDesk=='no'?'没趴桌子':i.headOnDesk=='yes'?'趴桌子':'未知'}}</span>
                       <span :style="{background:i.playMobilePhone=='yes'?'#FF6347':''}">{{i.playMobilePhone=='no'?'没玩手机':i.playMobilePhone=='yes'?'玩手机':'未知'}}</span>
                     </li>
-                    <li>{{changetime(i.datapoolCreateTime)}}</li>
-                    <li style="color: #FF9925;cursor: pointer;" @click="showmodel(i.snapHumanUrl)">查看</li>
+                    <li>{{changetime(i.happenTime)}}</li>
+                    <li style="color: #FF9925;cursor: pointer;" @click="showmodel(i.bkgUrl,i.snapHumanUrl,i.headOnDesk,i.listening)">查看</li>
                 </ul>
              </vue-seamless-scroll>
            </div>
@@ -83,7 +83,12 @@
      </div>
      <div class="model" v-if="show_m" style="z-index: 999999;">
         <div class="m_pic">
-          <img :src="pic_url" alt="">
+          <img :src="pic_url" alt="" style="max-width: 14rem;">
+          <img :src="snapHumanUrl" style="position: absolute;left: 0;max-height: 2rem;"/>
+          <div style="position: absolute;bottom: 0;right: 0;">
+            <el-tag >{{headOnDesk=='no'?'没趴桌子':headOnDesk=='yes'?'趴桌子':'未知'}}</el-tag>
+            <el-tag  type="success">{{listening=='no'?'没听讲':listening=='yes'?'听讲':'未知'}}</el-tag>
+          </div>
         </div>
         <img src="../../assets/icon_close.png" @click="show_m=false" alt="">
      </div>
@@ -102,7 +107,7 @@
                     <li>操作</li>
                   </ul>
                      <ul class="i_list"  v-for="i,index in list_beh1" :key='index'>
-                         <li>{{i.name}}</li>
+                         <li>{{i.humanName}}</li>
                          <li>{{i.className}}</li>
                          <li>
                            <span>{{i.posture=='sitting'?'坐下':i.posture=='standingUp'?'坐下':'未知'}}</span>
@@ -115,8 +120,8 @@
                            <span :style="{background:i.headOnDesk=='yes'?'#FF6347':''}">{{i.headOnDesk=='no'?'没趴桌子':i.headOnDesk=='yes'?'趴桌子':'未知'}}</span>
                            <span :style="{background:i.playMobilePhone=='yes'?'#FF6347':''}">{{i.playMobilePhone=='no'?'没玩手机':i.playMobilePhone=='yes'?'玩手机':'未知'}}</span>
                          </li>
-                         <li>{{changetime(i.datapoolCreateTime)}}</li>
-                         <li style="color: #FF9925;cursor: pointer;" @click="showmodel(i.snapHumanUrl)">查看</li>
+                         <li>{{changetime(i.happenTime)}}</li>
+                         <li style="color: #FF9925;cursor: pointer;" @click="showmodel(i.bkgUrl,i.snapHumanUrl,i.headOnDesk,i.listening)">查看</li>
                      </ul>
                 </div>
              </div>
@@ -156,10 +161,13 @@ export default {
       key_name:'',
       key_name1:'',
       pic_url:'',
+      snapHumanUrl:'',
       show_m:false,
       show_list:false,
       pages:0,
       page:1,
+      headOnDesk:'',
+      listening:''
     }
   },
   computed: {
@@ -246,8 +254,11 @@ export default {
       this.page=1;
       this.getlist_xw()
     },
-    showmodel(snapHumanUrl){//巡检
-      this.pic_url=snapHumanUrl;
+    showmodel(bkgUrl,snapHumanUrl,headOnDesk,listening){//巡检
+      this.pic_url=bkgUrl;
+      this.snapHumanUrl=snapHumanUrl;
+      this.headOnDesk=headOnDesk;
+      this.listening=listening;
       this.show_m=true;
     },
     getkaoqin(){  //全校考勤情况
@@ -268,8 +279,8 @@ export default {
        success: function (res) {
           if(res.code==200){
             _this.st_all=res.data.studentLate+res.data.studentLeave+res.data.studentLeaveEarly+res.data.studentNormal+res.data.studentTruancy;
-            _this.te_all=res.data.teacherTruancy+res.data.teacherNormal;
-            _this.getdata2(res.data.teacherTruancy,res.data.teacherNormal)
+            _this.te_all=res.data.teacherTruancy+res.data.teacherNormal+res.data.teacherLeaveEarly+res.data.teacherLeave+res.data.teacherLate;
+            _this.getdata2(res.data.teacherLate,res.data.teacherLeave,res.data.teacherLeaveEarly,res.data.teacherTruancy,res.data.teacherNormal);
             _this. getdata3(res.data.studentLate,res.data.studentLeave,res.data.studentLeaveEarly,res.data.studentNormal,res.data.studentTruancy)
           }
        }
@@ -383,7 +394,7 @@ export default {
        }
      })
     },
-    getdata2(teacherTruancy,teacherNormal){
+    getdata2(teacherLate,teacherLeave,teacherLeaveEarly,teacherTruancy,teacherNormal){
        var option = {
         tooltip: {
           trigger: 'item'
@@ -439,6 +450,9 @@ export default {
             show: false
           },
           data: [
+            { value: teacherLate, name: '迟到' },
+            { value: teacherLeave, name: '请假' },
+            { value: teacherLeaveEarly, name: '早退' },
             { value: teacherTruancy, name: '旷课' },
             { value: teacherNormal, name: '正常' },
           ],
@@ -898,9 +912,12 @@ this.myChart2.setOption(option);
     z-index: 3000;
     >.m_pic{
       position: absolute;
-      width: 100%;
+      //width: 100%;
+      width:14rem;
       text-align: center;
-      top: 20%;
+      top: 10%;
+      left: 50%;
+      margin-left: -7rem;
     }
     >img{
       position: absolute;

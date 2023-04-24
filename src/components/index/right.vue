@@ -197,8 +197,8 @@ export default {
        success: function (res) {
           if(res.code==200){
             _this.st_all=res.data.studentLate+res.data.studentLeave+res.data.studentLeaveEarly+res.data.studentNormal+res.data.studentTruancy;
-            _this.te_all=res.data.teacherTruancy+res.data.teacherNormal;
-            _this.getdata2(res.data.teacherTruancy,res.data.teacherNormal)
+           _this.te_all=res.data.teacherTruancy+res.data.teacherNormal+res.data.teacherLeaveEarly+res.data.teacherLeave+res.data.teacherLate;
+           _this.getdata2(res.data.teacherLate,res.data.teacherLeave,res.data.teacherLeaveEarly,res.data.teacherTruancy,res.data.teacherNormal);
              _this. getdata3(res.data.studentLate,res.data.studentLeave,res.data.studentLeaveEarly,res.data.studentNormal,res.data.studentTruancy)
           }
        }
@@ -369,7 +369,7 @@ export default {
               this.myChart1 = echarts.init(this.$refs.chart1);
               this.myChart1.setOption(option);
             },
-            getdata2(teacherTruancy,teacherNormal){  //教师考勤
+            getdata2(teacherLate,teacherLeave,teacherLeaveEarly,teacherTruancy,teacherNormal){  //教师考勤
                var option = {
                 tooltip: {
                   trigger: 'item'
@@ -425,8 +425,11 @@ export default {
                     show: false
                   },
                   data: [
-                    { value: teacherTruancy, name: '旷课' },
-                    { value: teacherNormal, name: '正常' },
+                   { value: teacherLate, name: '迟到' },
+                   { value: teacherLeave, name: '请假' },
+                   { value: teacherLeaveEarly, name: '早退' },
+                   { value: teacherTruancy, name: '旷课' },
+                   { value: teacherNormal, name: '正常' },
                   ],
                   itemStyle: {
                     normal: {

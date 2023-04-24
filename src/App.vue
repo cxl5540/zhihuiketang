@@ -143,4 +143,36 @@ button:focus{
   z-index: 100;
   background: rgba(255,255,255,0.2);
 }
+/*时间**/
+/deep/.el-range-editor .el-range-input{
+  background: none;
+  color: #A2D8F4;
+}
+.el-date-editor .el-range-separator,.el-time-range-picker__header,.el-time-spinner__item,.el-time-spinner__item.active:not(.disabled),.el-time-panel__btn,.el-date-editor .el-range-input{
+   color: #A2D8F4;
+}
+.el-time-range-picker__body{
+   border: 1px solid #3C6EAC;
+}
+.el-time-panel__content::after, .el-time-panel__content::before{
+   border-top: 1px solid #3C6EAC;
+   border-bottom: 1px solid #3C6EAC;
+}
+.el-time-panel__footer{
+  border-top: 1px solid #3C6EAC;
+  height: auto;
+}
+.el-time-spinner__item:hover,.el-time-spinner__item:hover:not(.disabled):not(.active){
+  background:#409EFF;
+}
+.el-range-editor .el-range-input{
+  background: #0E234B;
+}
+.el-range-editor.is-active{
+  border: 1px solid #3C6EAC;
+}
+.el-range-editor .el-range-input.active{
+  border: none;
+  outline: none;
+}
 </style>
